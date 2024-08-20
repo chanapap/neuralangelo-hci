@@ -18,7 +18,7 @@ validation_iter: 5000
 speed_benchmark: False
 
 checkpoint:
-    save_iter: 500
+    save_iter: 2000
 
 trainer:
     type: projects.neuralangelo.trainer
