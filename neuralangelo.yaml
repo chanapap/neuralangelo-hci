@@ -2,7 +2,7 @@
 name: neuralangelo
 channels:
   - conda-forge
-  - pytorch
+  # - pytorch
 dependencies:
   # general
   - gpustat
@@ -20,7 +20,7 @@ dependencies:
   - ninja
   - diskcache
   # pytorch
-  - pytorch
-  - torchvision
+  # - pytorch
+  # - torchvision
   - pip:
     - -r requirements.txt

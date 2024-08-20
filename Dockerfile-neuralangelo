@@ -1,0 +1,124 @@
+# docker build -f docker/Dockerfile-neuralangelo -t chenhsuanlin/neuralangelo:23.04-py3 .
+# docker push chenhsuanlin/neuralangelo:23.04-py3
+
+# FROM nvcr.io/nvidia/pytorch:23.04-py3 
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 as conda_builder
+ENV DEBIAN_FRONTEND noninteractive
+
+ARG FORCE_CUDA=1
+ARG TCNN_CUDA_ARCHITECTURES=70,72,75,80,86
+
+SHELL ["/bin/bash", "--login", "-c"]
+
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
+    --mount=type=cache,target=/var/lib/apt,sharing=private \
+    --mount=type=secret,id=passwd,target=/root/.secret \
+    rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends --reinstall \
+    ca-certificates \
+    wget \
+    sudo \
+    curl \
+    tree \
+    vim \
+    libglew-dev \
+    libassimp-dev \
+    libboost-all-dev \
+    libgtk-3-dev \
+    libopencv-dev \
+    libglfw3-dev \
+    libavdevice-dev \
+    libavcodec-dev \
+    libeigen3-dev \
+    libxxf86vm-dev \
+    libembree-dev \
+    libboost-program-options-dev \
+    libboost-filesystem-dev \
+    libboost-graph-dev \
+    libboost-system-dev \
+    libflann-dev \
+    libfreeimage-dev \
+    libmetis-dev \
+    libgoogle-glog-dev \
+    libgtest-dev \
+    libsqlite3-dev \
+    qtbase5-dev \
+    libqt5opengl5-dev \
+    libcgal-dev \
+    libceres-dev \
+    gcc-10 \
+    g++-10 \
+    cmake \
+    build-essential \
+    build-essential \
+    bzip2 \
+    ca-certificates \
+    cmake \
+    curl \
+    ffmpeg \
+    g++ \
+    git \
+    libx264-dev \
+    tmux \
+    wget \
+    ninja-build \
+    git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy Miniconda from a prebuilt image
+COPY --from=continuumio/miniconda3:23.10.0-1 /opt/conda /opt/conda
+
+# Set environment variables for Conda and CUDA
+ENV PATH=/opt/conda/bin:$PATH
+ENV TORCH_CUDA_ARCH_LIST="3.5;5.0;6.0;6.1;7.0;7.5;8.0;8.6+PTX"
+
+# Update and install necessary packages, using cache mounts for efficiency
+RUN --mount=type=cache,target=/var/cache/apt,sharing=private \
+    --mount=type=cache,target=/var/lib/apt,sharing=private \
+    rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
+    apt-get update && \
+    apt-get install -y build-essential
+
+# COLMAP
+RUN export CC=/usr/bin/gcc-10 && \
+    export CXX=/usr/bin/g++-10 && \
+    export CUDAHOSTCXX=/usr/bin/g++-10 && \
+    mkdir -p /home/$USER/workspace/ && \
+    cd /home/$USER/workspace/ && \
+    git clone https://github.com/colmap/colmap.git && \
+    cd colmap && \
+    mkdir build && \
+    cd build && \
+    cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES=$CMAKE_CUDA_ARCHITECTURES \
+                     -DCMAKE_INSTALL_PREFIX=/colmap_installed && \
+    ninja && \
+    ninja install
+RUN cd /home/$USER/workspace/ && \
+    cp -r /colmap_installed/* /usr/local/
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-nvrtc-11-8 \
+    cuda-cudart-dev-11-8 \
+    cuda-driver-dev-11-8 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install base Python libraries for Imaginaire
+WORKDIR /neuralangelo-copy
+COPY . .
+
+FROM conda_builder
+RUN conda env create --file neuralangelo.yaml
+SHELL ["conda", "run", "-n", "neuralangelo", "/bin/bash", "-c"]
+
+RUN conda install pytorch==2.2.1 torchvision==0.17.1 torchaudio==2.2.1 pytorch-cuda=11.8 -c pytorch -c nvidia
+RUN conda init
+RUN source /root/.bashrc
+
+WORKDIR /neuralangelo
+

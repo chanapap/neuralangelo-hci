@@ -132,6 +132,7 @@ def _cv_to_gl(cv):
 
 def export_to_json(cameras, images, bounding_box, center, radius, file_path):
     intrinsic_param = np.array([camera.params for camera in cameras.values()])
+    print(intrinsic_param)
     fl_x = intrinsic_param[0][0]  # TODO: only supports single camera for now
     fl_y = intrinsic_param[0][1]
     cx = intrinsic_param[0][2]
@@ -189,7 +190,7 @@ def export_to_json(cameras, images, bounding_box, center, radius, file_path):
 
 def data_to_json(args):
     cameras, images, points3D = read_model(os.path.join(args.data_dir, "sparse"), ext=".bin")
-
+    print(cameras)
     # define bounding regions based on scene type
     if args.scene_type == "outdoor":
         if check_concentric(images):

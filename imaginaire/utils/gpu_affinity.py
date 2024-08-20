@@ -19,17 +19,17 @@ import os
 
 import pynvml
 
-pynvml.nvmlInit()
+# pynvml.nvmlInit()
 
 
-def system_get_driver_version():
-    r"""Get Driver Version"""
-    return pynvml.nvmlSystemGetDriverVersion()
+# def system_get_driver_version():
+#     r"""Get Driver Version"""
+#     return pynvml.nvmlSystemGetDriverVersion()
 
 
-def device_get_count():
-    r"""Get number of devices"""
-    return pynvml.nvmlDeviceGetCount()
+# def device_get_count():
+#     r"""Get number of devices"""
+#     return pynvml.nvmlDeviceGetCount()
 
 
 class Device(object):
@@ -66,16 +66,16 @@ def set_affinity(gpu_id=None):
         gpu_id = int(os.getenv('LOCAL_RANK', 0))
 
     try:
-        dev = Device(gpu_id)
+        # dev = Device(gpu_id)
         # os.sched_setaffinity() method in Python is used to set the CPU affinity mask of a process indicated
         # by the specified process id.
         # A process’s CPU affinity mask determines the set of CPUs on which it is eligible to run.
         # Syntax: os.sched_setaffinity(pid, mask)
         # pid=0 means the current process
-        os.sched_setaffinity(0, dev.get_cpu_affinity())
+        # os.sched_setaffinity(0, dev.get_cpu_affinity())
         # list of ints
         # representing the logical cores this process is now affinitied with
-        return os.sched_getaffinity(0)
+        return  0 # os.sched_getaffinity(0)
 
     except pynvml.NVMLError:
         print("(Setting affinity with NVML failed, skipping...)")

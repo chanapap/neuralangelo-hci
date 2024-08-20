@@ -10,8 +10,13 @@
 
 # usage: preprocess.sh <sequence_name> <full_video_path> <downsample_rate> <scene_type>
 
-data_path=datasets/${1}_ds${3}
-bash projects/neuralangelo/scripts/run_ffmpeg.sh ${1} ${2} ${3}
+SEQUENCE=praa1
+PATH_TO_VIDEO=/datasets/praa1-neu/video.mp4
+DOWNSAMPLE_RATE=1
+SCENE_TYPE=object
+
+data_path=neudatasets/${SEQUENCE}_ds${DOWNSAMPLE_RATE}
+bash projects/neuralangelo/scripts/run_ffmpeg.sh ${SEQUENCE} ${PATH_TO_VIDEO} ${DOWNSAMPLE_RATE}
 bash projects/neuralangelo/scripts/run_colmap.sh ${data_path}
-python3 projects/neuralangelo/scripts/convert_data_to_json.py --data_dir ${data_path} --scene_type ${4}
-python3 projects/neuralangelo/scripts/generate_config.py --sequence_name ${1} --data_dir ${data_path} --scene_type ${4}
+python3 projects/neuralangelo/scripts/convert_data_to_json.py --data_dir ${data_path} --scene_type ${SCENE_TYPE}
+python3 projects/neuralangelo/scripts/generate_config.py --sequence_name ${SEQUENCE} --data_dir ${data_path} --scene_type ${SCENE_TYPE}
