@@ -122,3 +122,7 @@ RUN source /root/.bashrc
 
 WORKDIR /neuralangelo-hci
 
+# after this do
+# conda activate neuralangelo
+# pip install git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
+
