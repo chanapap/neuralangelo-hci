@@ -38,3 +38,7 @@ If any .sh file got error try running
 ```
 sed -i 's/\r$//' filename.sh
 ```
+
+### Output Folder Format
+
+![Alt text](img/output_folder_format.png?raw=true "Output Folder Format")
