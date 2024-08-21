@@ -32,3 +32,9 @@ bash 1-run_train.bash
 # Extract Mesh
 bash 2-run_mesh.bash
 ```
+
+If any .sh file got error try running 
+
+```
+sed -i 's/\r$//' filename.sh
+```

@@ -10,7 +10,7 @@
 
 # usage: preprocess.sh <sequence_name> <full_video_path> <downsample_rate> <scene_type>
 
-SEQUENCE=praa1
+SEQUENCE=praa2
 PATH_TO_VIDEO=/datasets/praa1-neu/video.mp4
 DOWNSAMPLE_RATE=1
 SCENE_TYPE=object
