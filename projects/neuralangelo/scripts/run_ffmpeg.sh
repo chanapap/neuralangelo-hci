@@ -10,10 +10,10 @@
 
 # usage: run_ffmpeg.sh <sequence_name> <full_video_path> <downsample_rate>
 
-data_path=neudatasets/${1}_ds${3}
+data_path=datasets/${1}_ds${3}
 image_path=${data_path}/images_raw
 mkdir -p ${image_path}
-# ffmpeg -i ${2} -vf "select=not(mod(n\,$3))" -vsync vfr -q:v 2 ${image_path}/%06d.jpg
+ffmpeg -i ${2} -vf "select=not(mod(n\,$3))" -vsync vfr -q:v 2 ${image_path}/%06d.jpg
 
-ffmpeg -i ${2} -qscale:v 1 -qmin 1 -vf fps=${3} ${image_path}/%06d.jpg
+# ffmpeg -i ${2} -qscale:v 1 -qmin 1 -vf fps=${3} ${image_path}/%06d.jpg
 
